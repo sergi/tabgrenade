@@ -1,0 +1,32 @@
+h1 {
+  font-size: 18px;
+  color: green;
+}
+
+#container ul li {
+  padding-top: 8px;
+  position: relative;
+}
+
+.link {
+  text-decoration: none;
+}
+
+.closeBtn {
+  position: absolute;
+  top: 10px;
+  left: 0px;
+  width: 14px;
+  height: 13px;
+  vertical-align: middle;
+  padding-top: 2px;
+  visibility: hidden;
+  cursor: pointer;
+}
+
+.favicon {
+  position: absolute;
+  top: 9px;
+  left: 25px;
+  cursor: move;
+}
