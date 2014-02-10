@@ -1,43 +1,38 @@
 var timeFormat = 'MMMM Do YYYY, h:mm:ss a'
-var template = '<ul>\
-    {{#tabs}}\
-      <h1>{{title}}</h1>\
-      <li><a href="{{url}}">{{title}}</a></li>\
-    {{/tabs}}\
-  </ul>'
-var byTime = {}
 
 self.port.on("allTabs", tabs => {
   var tabsByTime = tabs.reduce((prev, curr) => {
-    curr.fmtTime = moment(curr.time).format(timeFormat)
-    prev[curr.time] || (prev[curr.time] = [])
-    prev[curr.time].push(curr)
+    prev[curr.time] || (prev[curr.time] = []);
+    prev[curr.time].push(curr);
     return prev
-  }, byTime)
-  console.log(tabsByTime.toSource())
-//  document.getElementById("container").innerHTML =
-//    Mustache.render(template, , {})
-})
-/*
- var ul = document.createElement("ul")
- tabs.forEach(function(tab) {
- if (!frags[tab.time]) {
- frags[tab.time] = document.createDocumentFragment();
+  }, {});
 
- var title = document.createElement('h1');
- title.innerHTML = moment(tab.time).format('MMMM Do YYYY, h:mm:ss a');
- frags[tab.time].appendChild(title);
- }
+  for (var key in tabsByTime) {
+    var len = tabsByTime[key].length;
+    var formattedTime = moment(parseInt(key)).format(timeFormat);
+    var template = '<ul>\
+      <h1 style="display: inline-block">' + len + ( len > 1 ? ' tabs' : ' tab') + '</h1>\
+      <div style="display: inline-block; padding-left: 28px; vertical-align: middle;">\
+        <div class="created_on">Created on ' + formattedTime + '</div>\
+        <div class="restore_all">Restore all</div>\
+        <div class="delete_all">Delete all</div>\
+        <div class="open_page">Share as web page</div>\
+      </div>\
+      {{#' + key + '}}\
+      <li><a href="{{{url}}}">{{title}}</a></li>\
+      {{/' + key + '}}\
+    </ul>';
 
- var link = document.createElement('a');
- link.innerHTML = tab.title;
- link.setAttribute('href', tab.url);
+    document.getElementById("container").innerHTML +=
+      Mustache.render(template, tabsByTime);
+  }
+});
 
- var li = document.createElement('li');
- li.appendChild(link)
 
- frags[tab.time].appendChild(li);
- ul.appendChild(frags[tab.time]);
- });
- })
- ; */
+document.addEventListener('click', function(e) {
+  var t = e.target;
+
+  if (t.classList.contains('open_page')) {
+    alert(t.getAttribute('data-id'))
+  }
+});

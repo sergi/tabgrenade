@@ -1,6 +1,10 @@
 h1 {
-  font-size: 18px;
-  color: green;
+  font-size: 24px;
+  color: #333;
+}
+
+#container {
+  margin-top: 35px;
 }
 
 #container ul li {
@@ -29,4 +33,15 @@ h1 {
   top: 9px;
   left: 25px;
   cursor: move;
+}
+
+.open_page, .restore_all, .delete_all {
+  cursor: pointer;
+  padding-right: 30px;
+  display: inline-block;
+  font-size: 11px
+}
+
+.created_on {
+  font-size: 11px; font-weight: 400; color: rgb(136, 136, 136); padding-top: 6px; padding-bottom: 0px;
 }

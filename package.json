@@ -3,7 +3,7 @@
     "license": "MPL 2.0", 
     "author": "Sergi Mansilla (http://sergimansilla.com) <sergi.mansilla@gmail.com>",
     "version": "0.1",
-    icon: "data/grenade.png",
+    "icon": "data/grenade.png",
     "fullName": "Tab Grenade",
     "id": "jid1-gzlHTgBCb5hzkA", 
     "description": "Tab Grenade is a Firefox Browser extension that creates a persistent list of all your open tabs and then closes them all"
