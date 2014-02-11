@@ -15,11 +15,11 @@ self.port.on("allTabs", tabs => {
     return a - b;
   }).reverse();
 
-  sortedKeys.forEach(function(key) {
+  document.getElementById("container").innerHTML = sortedKeys.map(function(key) {
     key = key + '';
     var len = tabsByTime[key].length;
     var formattedTime = moment(parseInt(key)).format(timeFormat);
-    var template = '<ul>\
+    return Mustache.render('<ul>\
       <h1 style="display: inline-block">' + len + ( len > 1 ? ' tabs' : ' tab') + '</h1>\
       <div style="display: inline-block; padding-left: 28px; vertical-align: middle;">\
         <div class="created_on">Created on ' + formattedTime + '</div>\
@@ -30,11 +30,8 @@ self.port.on("allTabs", tabs => {
       {{#' + key + '}}\
       <li><a href="{{{url}}}">{{title}}</a></li>\
       {{/' + key + '}}\
-    </ul>';
-
-    document.getElementById("container").innerHTML +=
-      Mustache.render(template, tabsByTime);
-  });
+    </ul>', tabsByTime);
+  }).join('');
 
   document.addEventListener('click', function(e) {
     var t = e.target;
@@ -45,8 +42,8 @@ self.port.on("allTabs", tabs => {
       obj.time = null;
       group.set("tabs", obj);
       group.save(null, {
-        success: function(obj) {
-          console.log('yay!', obj)
+        success: function(data) {
+          self.port.emit('open_tab', 'http://tabgrena.de/' + data.id);
         },
         error: function(model, error) {
           console.log(model, error.toSource())
