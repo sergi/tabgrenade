@@ -21,11 +21,11 @@ self.port.on("allTabs", tabs => {
     var formattedTime = moment(parseInt(key)).format(timeFormat);
     return Mustache.render('<ul>\
       <h1 style="display: inline-block">' + len + ( len > 1 ? ' tabs' : ' tab') + '</h1>\
-      <div style="display: inline-block; padding-left: 28px; vertical-align: middle;">\
+      <div style="display: inline-block; padding-left: 28px; vertical-align: middle;" data-id="' + key + '">\
         <div class="created_on">Created on ' + formattedTime + '</div>\
         <div class="restore_all">Open all</div>\
         <div class="delete_all">Remove all</div>\
-        <div class="open_page" data-id="' + key + '">Share as web page</div>\
+        <div class="open_page">Share as web page</div>\
       </div>\
       {{#' + key + '}}\
       <li><a href="{{{url}}}">{{title}}</a></li>\
@@ -38,7 +38,7 @@ self.port.on("allTabs", tabs => {
 
     if (t.classList.contains('open_page')) {
       var group = new TabGroup();
-      var obj = tabsByTime[t.getAttribute('data-id')]
+      var obj = tabsByTime[t.parentNode.getAttribute('data-id')]
       obj.time = null;
       group.set("tabs", obj);
       group.save(null, {
@@ -49,6 +49,12 @@ self.port.on("allTabs", tabs => {
           console.log(model, error.toSource())
         }
       });
+    }
+
+    if (t.classList.contains('restore_all')) {
+      var group = new TabGroup();
+      var obj = tabsByTime[t.parentNode.getAttribute('data-id')]
+      var tabs = obj.forEach(t => self.port.emit('open_tab', t.url));
     }
   });
 
