@@ -23,7 +23,7 @@ self.port.on("allTabs", tabs => {
       <div style="display: inline-block; padding-left: 28px; vertical-align: middle;" data-id="' + key + '">\
         <div class="created_on">Created on ' + formattedTime + '</div>\
         <div class="restore_all">Open all</div>\
-        <div class="delete_all">Remove all</div>\
+        <!--<div class="delete_all">Remove all</div>-->\
         <div class="open_page">Share as web page</div>\
       </div>\
       {{#' + key + '}}\
@@ -33,11 +33,12 @@ self.port.on("allTabs", tabs => {
   }).join('');
 
   document.addEventListener('click', function(e) {
+    var obj;
     var t = e.target;
 
     if (t.classList.contains('open_page')) {
       var group = new TabGroup();
-      var obj = tabsByTime[t.parentNode.getAttribute('data-id')]
+      obj = tabsByTime[t.parentNode.getAttribute('data-id')]
       obj.time = null;
       group.set("tabs", obj);
       group.save(null, {
@@ -51,9 +52,8 @@ self.port.on("allTabs", tabs => {
     }
 
     if (t.classList.contains('restore_all')) {
-      var group = new TabGroup();
-      var obj = tabsByTime[t.parentNode.getAttribute('data-id')]
-      var tabs = obj.forEach(t => self.port.emit('open_tab', t.url));
+      tabsByTime[parseInt(t.parentNode.getAttribute('data-id'))]
+        .forEach(t => self.port.emit('open_tab', t.url));
     }
   });
 
