@@ -6,9 +6,8 @@ var TabGroup = Parse.Object.extend("TabGroup");
 
 self.port.on("allTabs", tabs => {
   var tabsByTime = tabs.reduce((prev, curr) => {
-    prev[curr.time] || (prev[curr.time] = []);
-    prev[curr.time].push(curr);
-    return prev
+    prev[curr[0]] = curr[1];
+    return prev;
   }, {});
 
   var sortedKeys = Object.keys(tabsByTime).map(x=>parseInt(x)).sort((a, b) => {
