@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <link rel="stylesheet" type="text/css" href="data/pure-nr-min.css">
+  <link rel="stylesheet" type="text/css" href="data/style.css">
+  <title>Tab Grenade</title>
+  <script src="data/moment.min.js"></script>
+  <script src="data/mustache.js"></script>
+  <script src="//www.parsecdn.com/js/parse-1.2.16.min.js"></script>
+  <script>
+    Parse.initialize("dibRma54UIQ0UYErXdDV0EPdk32AtUSEBQll0Lc7",
+        "iwP0ckwxi7g8ZVWVaJwoel61ckdoUbPPuj2OPPXR");
+
+    var timeFormat = 'MMMM Do YYYY, h:mm:ss a'
+    var urlId = window.location.pathname.trim()
+    urlId = urlId.substr(1, urlId.length)
+  </script>
+<body>
+<div class="content">
+  <div class="header">
+    <div class="pure-menu pure-menu-open pure-menu-fixed pure-menu-horizontal">
+      <a class="pure-menu-heading" href="">Tab Grenade</a>
+    </div>
+  </div>
+
+  <div id="container"></div>
+  <script>
+    var TabGroup = Parse.Object.extend("TabGroup");
+    var query = new Parse.Query(TabGroup);
+    query.get('MMiPjepvlp', {
+      success: function(gameScore) {
+        var tabs = gameScore.attributes.tabs
+        var tabsByTime = tabs.reduce((prev, curr) => {
+          if (!prev[curr.time])
+            prev[curr.time] = [];
+
+          prev[curr.time].push({
+            url: curr.url,
+            title: curr.title
+          });
+          return prev;
+        }, {});
+
+        var sortedKeys = Object.keys(tabsByTime).map(x=>parseInt(x)).sort((a, b) => {
+          return a - b;
+        }).reverse();
+
+        document.getElementById("container").innerHTML = sortedKeys.map(function(key) {
+          key = parseInt(key);
+          var len = tabsByTime[key].length;
+          var formattedTime = moment(parseInt(key)).format(timeFormat);
+          return Mustache.render('<ul>\
+      <h1 style="display: inline-block">' + len + ( len > 1 ? ' tabs' : ' tab') + '</h1>\
+      <div style="display: inline-block; padding-left: 28px; vertical-align: middle;" data-id="' + key + '">\
+        <div class="created_on">Created on ' + formattedTime + '</div>\
+        <div class="restore_all">Open all</div>\
+        <!--<div class="delete_all">Remove all</div>-->\
+        <!--<div class="open_page">Share as web page</div>-->\
+      </div>\
+      {{#' + key + '}}\
+      <li><a href="{{{url}}}">{{title}}</a></li>\
+      {{/' + key + '}}\
+    </ul>', tabsByTime);
+        }).join('');
+      },
+      error: function(object, error) {
+        // The object was not retrieved successfully.
+        // error is a Parse.Error with an error code and description.
+      }
+    });
+  </script>
+</div>
+</body>
+</html>
