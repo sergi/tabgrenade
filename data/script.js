@@ -1,71 +1,67 @@
-var timeFormat = 'MMMM Do YYYY, h:mm:ss a'
+var timeFormat = 'MMMM Do YYYY, h:mm:ss a';
 Parse.initialize("dibRma54UIQ0UYErXdDV0EPdk32AtUSEBQll0Lc7",
   "iwP0ckwxi7g8ZVWVaJwoel61ckdoUbPPuj2OPPXR");
 
+var tabsByTime;
 var TabGroup = Parse.Object.extend("TabGroup");
+var tpl = document.getElementById('link_template').innerHTML;
+console.log(tpl)
+
+document.addEventListener('click', function(e) {
+  var obj;
+  var t = e.target;
+  var id = parseInt(t.parentNode.getAttribute('data-id'));
+
+  if (!tabsByTime) {
+    return;
+  }
+
+  if (t.classList.contains('open_page')) {
+    var group = new TabGroup();
+    obj = tabsByTime[id];
+    obj.time = null;
+    group.set("tabs", obj);
+    group.save(null, {
+      success: function(data) {
+        self.port.emit('open_tab', 'http://tabgrena.de/' + data.id);
+      },
+      error: function(model, error) {
+        console.log(model, error.toSource())
+      }
+    });
+  }
+
+  if (t.classList.contains('restore_all')) {
+    tabsByTime[id].forEach(t => self.port.emit('open_tab', t.url));
+  }
+});
 
 self.port.on("allTabs", tabs => {
-  var tabsByTime = tabs.reduce((prev, curr) => {
+  tabsByTime = tabs.reduce((prev, curr) => {
     prev[curr[0]] = curr[1];
     return prev;
   }, {});
 
-  var sortedKeys = Object.keys(tabsByTime).map(x=>parseInt(x)).sort((a, b) => {
+  var sortedKeys = Object.keys(tabsByTime).sort((a, b) => {
     return a - b;
   }).reverse();
 
   document.getElementById("container").innerHTML = sortedKeys.map(function(key) {
-    key = key + '';
     var len = tabsByTime[key].length;
     var formattedTime = moment(parseInt(key)).format(timeFormat);
-    return Mustache.render('<ul>\
-      <h1 style="display: inline-block">' + len + ( len > 1 ? ' tabs' : ' tab') + '</h1>\
-      <div style="display: inline-block; padding-left: 28px; vertical-align: middle;" data-id="' + key + '">\
-        <div class="created_on">Created on ' + formattedTime + '</div>\
-        <div class="restore_all">Open all</div>\
-        <!--<div class="delete_all">Remove all</div>-->\
-        <div class="open_page">Share as web page</div>\
-      </div>\
-      {{#' + key + '}}\
-      <li><a href="{{{url}}}">{{title}}</a></li>\
-      {{/' + key + '}}\
-    </ul>', tabsByTime);
+    var a = document.createElement('a');
+    tabsByTime[key] = tabsByTime[key].map(t => {
+      a.href = t.url;
+      t.domain = a.hostname;
+      return t;
+    });
+
+    return Mustache.render(tpl, {
+      key: key,
+      content: tabsByTime[key],
+      formattedTime: formattedTime,
+      len: len + ( len > 1 ? ' tabs' : ' tab')
+    });
   }).join('');
-
-  document.addEventListener('click', function(e) {
-    var obj;
-    var t = e.target;
-
-    if (t.classList.contains('open_page')) {
-      var group = new TabGroup();
-      obj = tabsByTime[t.parentNode.getAttribute('data-id')]
-      obj.time = null;
-      group.set("tabs", obj);
-      group.save(null, {
-        success: function(data) {
-          self.port.emit('open_tab', 'http://tabgrena.de/' + data.id);
-        },
-        error: function(model, error) {
-          console.log(model, error.toSource())
-        }
-      });
-    }
-
-    if (t.classList.contains('restore_all')) {
-      tabsByTime[parseInt(t.parentNode.getAttribute('data-id'))]
-        .forEach(t => self.port.emit('open_tab', t.url));
-    }
-  });
-
-  function s4() {
-    return Math.floor((1 + Math.random()) * 0x10000)
-      .toString(16)
-      .substring(1);
-  }
-
-  function guid() {
-    return s4() + s4() + '' + s4() + '' + s4() + '' +
-      s4() + '' + s4() + s4() + s4();
-  }
 });
 

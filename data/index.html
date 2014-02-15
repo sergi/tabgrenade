@@ -4,6 +4,20 @@
   <link rel="stylesheet" type="text/css" href="pure-nr-min.css">
   <link rel="stylesheet" type="text/css" href="style.css">
   <title>Tab Grenade</title>
+  <script id="link_template" type="text/html">
+    <ul>
+      <h1>{{tabLen}}</h1>
+      <div class="info_block" data-id="{{key}}">
+        <div class="created_on">Created on {{formattedTime}}</div>
+        <div class="restore_all">Open all</div>
+        <!--<div class="delete_all">Remove all</div>-->
+        <div class="open_page">Share as web page</div>
+      </div>
+      {{#content}}
+      <li style="list-style-image: url('https://www.google.com/s2/favicons?domain={{domain}}');"><a href="{{{url}}}" target="_blank">{{title}}</a></li>
+      {{/content}}
+    </ul>
+  </script>
 <body>
 <div class="content">
   <div class="header">
@@ -11,7 +25,6 @@
       <a class="pure-menu-heading" href="">Tab Grenade</a>
     </div>
   </div>
-
   <div id="container"></div>
 </div>
 </body>
