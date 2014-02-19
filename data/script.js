@@ -5,7 +5,6 @@ Parse.initialize("dibRma54UIQ0UYErXdDV0EPdk32AtUSEBQll0Lc7",
 var tabsByTime;
 var TabGroup = Parse.Object.extend("TabGroup");
 var tpl = document.getElementById('link_template').innerHTML;
-console.log(tpl)
 
 document.addEventListener('click', function(e) {
   var obj;
@@ -19,7 +18,6 @@ document.addEventListener('click', function(e) {
   if (t.classList.contains('open_page')) {
     var group = new TabGroup();
     obj = tabsByTime[id];
-    obj.time = null;
     group.set("tabs", obj);
     group.save(null, {
       success: function(data) {
@@ -60,7 +58,7 @@ self.port.on("allTabs", tabs => {
       key: key,
       content: tabsByTime[key],
       formattedTime: formattedTime,
-      len: len + ( len > 1 ? ' tabs' : ' tab')
+      tabLen: len + ( len > 1 ? ' tabs' : ' tab')
     });
   }).join('');
 });

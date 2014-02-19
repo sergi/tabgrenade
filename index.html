@@ -1,31 +1,34 @@
 <!DOCTYPE html>
 <html>
 <head>
+  <meta charset="utf-8">
+  <title>Tab Grenade</title>
+
   <link rel="stylesheet" type="text/css" href="data/pure-nr-min.css">
   <link rel="stylesheet" type="text/css" href="data/style.css">
-  <title>Tab Grenade</title>
+
   <script src="data/moment.min.js"></script>
   <script src="data/mustache.js"></script>
-  <script src="//www.parsecdn.com/js/parse-1.2.16.min.js"></script>
+  <script src="data/parse-1.2.16.min.js"></script>
   <script>
     Parse.initialize("dibRma54UIQ0UYErXdDV0EPdk32AtUSEBQll0Lc7",
         "iwP0ckwxi7g8ZVWVaJwoel61ckdoUbPPuj2OPPXR");
 
-    var timeFormat = 'MMMM Do YYYY, h:mm:ss a'
-    var urlId = window.location.pathname.trim()
+    var timeFormat = 'MMMM Do YYYY, h:mm:ss a';
+    var urlId = window.location.pathname.trim();
     urlId = urlId.substr(1, urlId.length)
   </script>
   <script id="link_template" type="text/html">
     <ul>
       <h1>{{tabLen}}</h1>
+
       <div class="info_block" data-id="{{key}}">
         <div class="created_on">Created on {{formattedTime}}</div>
-        <div class="restore_all">Open all</div>
-        <!--<div class="delete_all">Remove all</div>-->
-        <div class="open_page">Share as web page</div>
       </div>
       {{#content}}
-      <li style="list-style-image: url('https://www.google.com/s2/favicons?domain={{domain}}');"><a href="{{{url}}}" target="_blank">{{title}}</a></li>
+      <li style="list-style-image: url('https://www.google.com/s2/favicons?domain={{domain}}');">
+        <a href="{{{url}}}" target="_blank">{{title}}</a>
+      </li>
       {{/content}}
     </ul>
   </script>
@@ -39,12 +42,13 @@
 
   <div id="container"></div>
   <script>
+    var tpl = document.getElementById('link_template').innerHTML;
     var TabGroup = Parse.Object.extend("TabGroup");
     var query = new Parse.Query(TabGroup);
     query.get(urlId, {
       success: function(gameScore) {
-        var tabs = gameScore.attributes.tabs
-        var tabsByTime = tabs.reduce((prev, curr) => {
+        var tabs = gameScore.attributes.tabs;
+        var tabsByTime = tabs.reduce(function(prev, curr) {
           if (!prev[curr.time])
             prev[curr.time] = [];
 
@@ -55,7 +59,7 @@
           return prev;
         }, {});
 
-        var sortedKeys = Object.keys(tabsByTime).map(x=>parseInt(x)).sort((a, b) => {
+        var sortedKeys = Object.keys(tabsByTime).sort(function(a, b) {
           return a - b;
         }).reverse();
 
@@ -63,7 +67,7 @@
           var len = tabsByTime[key].length;
           var formattedTime = moment(parseInt(key)).format(timeFormat);
           var a = document.createElement('a');
-          tabsByTime[key] = tabsByTime[key].map(t => {
+          tabsByTime[key] = tabsByTime[key].map(function(t) {
             a.href = t.url;
             t.domain = a.hostname;
             return t;
@@ -73,7 +77,7 @@
             key: key,
             content: tabsByTime[key],
             formattedTime: formattedTime,
-            len: len + ( len > 1 ? ' tabs' : ' tab')
+            tabLen: len + ( len > 1 ? ' tabs' : ' tab')
           });
         }).join('');
       },
