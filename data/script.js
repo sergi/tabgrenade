@@ -30,7 +30,7 @@ document.addEventListener('click', function(e) {
   }
 
   if (t.classList.contains('restore_all')) {
-    tabsByTime[id].forEach(t => self.port.emit('open_tab', t.url));
+    tabsByTime[id].forEach(self.port.emit.bind(this, 'open_tab'));
   }
 });
 
