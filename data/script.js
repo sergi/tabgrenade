@@ -4,7 +4,6 @@ Parse.initialize("dibRma54UIQ0UYErXdDV0EPdk32AtUSEBQll0Lc7",
 
 var tabsByTime;
 var TabGroup = Parse.Object.extend("TabGroup");
-var tpl = document.getElementById('link_template').innerHTML;
 
 document.addEventListener('click', function(e) {
   var obj;
@@ -35,8 +34,11 @@ document.addEventListener('click', function(e) {
 });
 
 self.port.on("allTabs", tabs => {
+  var a = document.createElement('a');
   tabsByTime = tabs.reduce((prev, curr) => {
     prev[curr[0]] = curr[1];
+    a.href = curr[1].url;
+    prev[curr[0]].domain = a.hostname;
     return prev;
   }, {});
 
@@ -44,22 +46,45 @@ self.port.on("allTabs", tabs => {
     return a - b;
   }).reverse();
 
-  document.getElementById("container").innerHTML = sortedKeys.map(function(key) {
+  var container = document.getElementById("container");
+  var containerFragment = document.createDocumentFragment();
+
+  sortedKeys.forEach(function(key) {
+    var blockFragment = document.createDocumentFragment();
     var len = tabsByTime[key].length;
-    var formattedTime = moment(parseInt(key)).format(timeFormat);
-    var a = document.createElement('a');
-    tabsByTime[key] = tabsByTime[key].map(t => {
-      a.href = t.url;
-      t.domain = a.hostname;
-      return t;
+    var date = new Date(parseInt(key, 10));
+    var formattedTime = date.toDateString() + ', ' + date.toTimeString();
+
+    var ul = document.createElement('ul');
+    var h1 = document.createElement('h1');
+    var info = document.createElement('div');
+    var createdOn = document.createElement('div');
+
+    h1.textContent = len + ( len > 1 ? ' tabs' : ' tab');
+    info.className = 'info_block';
+    info.setAttribute('data-id', key);
+    createdOn.className = 'created_on';
+    createdOn.textContent = 'Created on ' + formattedTime;
+    info.appendChild(createdOn);
+
+    tabsByTime[key].forEach(function(item) {
+      var li = document.createElement('li');
+      li.style.listStyleImage = 'url(\'https://www.google.com/s2/favicons?domain=' + item.domain + '\')';
+      var _a = document.createElement('a');
+      _a.href = item.url;
+      _a.target = '_blank';
+      _a.textContent = item.title;
+      li.appendChild(_a);
+      ul.appendChild(li);
     });
 
-    return Mustache.render(tpl, {
-      key: key,
-      content: tabsByTime[key],
-      formattedTime: formattedTime,
-      tabLen: len + ( len > 1 ? ' tabs' : ' tab')
-    });
-  }).join('');
+    blockFragment.appendChild(h1);
+    blockFragment.appendChild(info);
+    blockFragment.appendChild(ul);
+
+    containerFragment.appendChild(blockFragment);
+  });
+
+  container.appendChild(containerFragment);
 });
 

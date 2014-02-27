@@ -7,9 +7,7 @@
   <link rel="stylesheet" type="text/css" href="data/pure-nr-min.css">
   <link rel="stylesheet" type="text/css" href="data/style.css">
 
-  <script src="data/moment.min.js"></script>
-  <script src="data/mustache.js"></script>
-  <script src="data/parse-1.2.16.min.js"></script>
+  <script src="data/parse-1.2.17.js"></script>
   <script>
     Parse.initialize("dibRma54UIQ0UYErXdDV0EPdk32AtUSEBQll0Lc7",
         "iwP0ckwxi7g8ZVWVaJwoel61ckdoUbPPuj2OPPXR");
@@ -17,20 +15,6 @@
     var timeFormat = 'MMMM Do YYYY, h:mm:ss a';
     var urlId = window.location.pathname.trim();
     urlId = urlId.substr(1, urlId.length)
-  </script>
-  <script id="link_template" type="text/html">
-    <ul>
-      <h1>{{tabLen}}</h1>
-
-      <div class="info_block" data-id="{{key}}">
-        <div class="created_on">Created on {{formattedTime}}</div>
-      </div>
-      {{#content}}
-      <li style="list-style-image: url('https://www.google.com/s2/favicons?domain={{domain}}');">
-        <a href="{{{url}}}" target="_blank">{{title}}</a>
-      </li>
-      {{/content}}
-    </ul>
   </script>
 <body>
 <div class="content">
@@ -42,19 +26,21 @@
 
   <div id="container"></div>
   <script>
-    var tpl = document.getElementById('link_template').innerHTML;
     var TabGroup = Parse.Object.extend("TabGroup");
     var query = new Parse.Query(TabGroup);
     query.get(urlId, {
       success: function(gameScore) {
         var tabs = gameScore.attributes.tabs;
+        var a = document.createElement('a');
         var tabsByTime = tabs.reduce(function(prev, curr) {
           if (!prev[curr.time])
             prev[curr.time] = [];
 
+          a.href = curr[1].url;
           prev[curr.time].push({
             url: curr.url,
-            title: curr.title
+            title: curr.title,
+            domain: a.hostname
           });
           return prev;
         }, {});
@@ -63,28 +49,49 @@
           return a - b;
         }).reverse();
 
-        document.getElementById("container").innerHTML = sortedKeys.map(function(key) {
+        var container = document.getElementById("container");
+        var containerFragment = document.createDocumentFragment();
+
+        sortedKeys.forEach(function(key) {
+          var blockFragment = document.createDocumentFragment();
           var len = tabsByTime[key].length;
-          var formattedTime = moment(parseInt(key)).format(timeFormat);
-          var a = document.createElement('a');
-          tabsByTime[key] = tabsByTime[key].map(function(t) {
-            a.href = t.url;
-            t.domain = a.hostname;
-            return t;
+          var date = new Date(parseInt(key, 10));
+          var formattedTime = date.toDateString() + ', ' + date.toTimeString();
+
+          var ul = document.createElement('ul');
+          var h1 = document.createElement('h1');
+          var info = document.createElement('div');
+          var createdOn = document.createElement('div');
+
+          h1.textContent = len + ( len > 1 ? ' tabs' : ' tab');
+          info.className = 'info_block';
+          info.setAttribute('data-id', key);
+          createdOn.className = 'created_on';
+          createdOn.textContent = 'Created on ' + formattedTime;
+          info.appendChild(createdOn);
+
+          tabsByTime[key].forEach(function(item) {
+            var li = document.createElement('li');
+            li.style.listStyleImage = 'url(\'https://www.google.com/s2/favicons?domain=' + item.domain + '\')';
+            var _a = document.createElement('a');
+            _a.href = item.url;
+            _a.target = '_blank';
+            _a.textContent = item.title;
+            li.appendChild(a);
+            ul.appendChild(li);
           });
 
-          return Mustache.render(tpl, {
-            key: key,
-            content: tabsByTime[key],
-            formattedTime: formattedTime,
-            tabLen: len + ( len > 1 ? ' tabs' : ' tab')
-          });
-        }).join('');
+          blockFragment.appendChild(h1);
+          blockFragment.appendChild(info);
+          blockFragment.appendChild(ul);
+
+          containerFragment.appendChild(blockFragment);
+        });
       },
       error: function(object, error) {
         // The object was not retrieved successfully.
         // error is a Parse.Error with an error code and description.
-        document.getElementById("container").innerHTML =
+        document.getElementById("container").textContent =
             "There was an error retrieving the tabs :(";
       }
     });
