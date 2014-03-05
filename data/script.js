@@ -34,11 +34,8 @@ document.addEventListener('click', function(e) {
 });
 
 self.port.on("allTabs", tabs => {
-  var a = document.createElement('a');
   tabsByTime = tabs.reduce((prev, curr) => {
     prev[curr[0]] = curr[1];
-    a.href = curr[1].url;
-    prev[curr[0]].domain = a.hostname;
     return prev;
   }, {});
 
@@ -69,11 +66,11 @@ self.port.on("allTabs", tabs => {
 
     tabsByTime[key].forEach(function(item) {
       var li = document.createElement('li');
-      li.style.listStyleImage = 'url(\'https://www.google.com/s2/favicons?domain=' + item.domain + '\')';
       var _a = document.createElement('a');
       _a.href = item.url;
       _a.target = '_blank';
       _a.textContent = item.title;
+      li.style.listStyleImage = 'url(https://www.google.com/s2/favicons?domain=' + _a.hostname + ')';
       li.appendChild(_a);
       ul.appendChild(li);
     });
