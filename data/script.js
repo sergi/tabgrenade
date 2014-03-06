@@ -17,10 +17,12 @@ document.addEventListener('click', function(e) {
   if (t.classList.contains('open_page')) {
     var group = new TabGroup();
     obj = tabsByTime[id];
-    group.set("tabs", obj);
+    group.set('tabs', obj);
     group.save(null, {
       success: function(data) {
-        self.port.emit('open_tab', 'http://tabgrena.de/' + data.id);
+        self.port.emit('open_tab', {
+          url: 'http://tabgrena.de/' + data.id
+        });
       },
       error: function(model, error) {
         console.log(model, error.toSource())
@@ -56,13 +58,21 @@ self.port.on("allTabs", tabs => {
     var h1 = document.createElement('h1');
     var info = document.createElement('div');
     var createdOn = document.createElement('div');
+    var restoreAll = document.createElement('div');
+    var shareAll = document.createElement('div');
 
     h1.textContent = len + ( len > 1 ? ' tabs' : ' tab');
     info.className = 'info_block';
     info.setAttribute('data-id', key);
     createdOn.className = 'created_on';
     createdOn.textContent = 'Created on ' + formattedTime;
+    restoreAll.className = 'restore_all';
+    restoreAll.textContent = 'Open all';
+    shareAll.className = 'open_page';
+    shareAll.textContent = 'Share as web page';
     info.appendChild(createdOn);
+    info.appendChild(restoreAll);
+    info.appendChild(shareAll);
 
     tabsByTime[key].forEach(function(item) {
       var li = document.createElement('li');
