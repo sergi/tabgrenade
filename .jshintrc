@@ -1,0 +1,22 @@
+{
+  "curly": true,
+  "latedef": "nofunc",
+  "newcap": false,
+  "noarg": true,
+  "nonew": true,
+  "quotmark": "single",
+  "undef": true,
+  "unused": "vars",
+  "strict": true,
+  "trailing": true,
+  "maxlen": 80,
+
+  "eqnull": true,
+  "eqeqeq": true,
+  "expr": true,
+  "globalstrict": true,
+
+
+  "browser": true,
+  "moz": true
+}
