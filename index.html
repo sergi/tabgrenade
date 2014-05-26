@@ -72,11 +72,13 @@
 
           tabsByTime[key].forEach(function(item) {
             var li = document.createElement('li');
-            li.style.listStyleImage = 'url(\'https://www.google.com/s2/favicons?domain=' + item.domain + '\')';
+            var icon = document.createElement('img');
+            icon.src = 'https://www.google.com/s2/favicons?domain=' + item.domain;
             var _a = document.createElement('a');
             _a.href = item.url;
             _a.target = '_blank';
             _a.textContent = item.title;
+            li.appendChild(icon);
             li.appendChild(a);
             ul.appendChild(li);
           });

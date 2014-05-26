@@ -5,11 +5,20 @@ h1 {
 
 #container {
   margin-top: 35px;
+  margin-left: 20px;
 }
 
 #container ul li {
-  padding-top: 8px;
   position: relative;
+  list-style-type: none;
+  line-height: 1.8;
+}
+
+#container ul img {
+    vertical-align: middle;
+    margin-right: 5px;
+    max-width: 16px;
+    max-height: 16px;
 }
 
 #container h1 {
@@ -18,25 +27,6 @@ h1 {
 
 .link {
   text-decoration: none;
-}
-
-.closeBtn {
-  position: absolute;
-  top: 10px;
-  left: 0;
-  width: 14px;
-  height: 13px;
-  vertical-align: middle;
-  padding-top: 2px;
-  visibility: hidden;
-  cursor: pointer;
-}
-
-.favicon {
-  position: absolute;
-  top: 9px;
-  left: 25px;
-  cursor: move;
 }
 
 .open_page, .restore_all, .delete_all {
@@ -53,3 +43,13 @@ h1 {
 .info_block {
   display: inline-block; padding-left: 28px; vertical-align: middle;
 }
+
+.closeBtn {
+    cursor: pointer;
+    margin-right: 5px;
+    vertical-align: middle;
+    color: #666;
+    font-size: 12px;
+    
+}
+ .closeBtn:before{ content: "\274C\ "; }
