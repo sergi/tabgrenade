@@ -41,9 +41,9 @@ document.addEventListener('click', function(e) {
     var li = t.parentNode;
     li.parentNode.removeChild(li);
 
-    if (li.parentNode.querySelectorAll('li').length === 0) {
+    //if (li.parentNode.querySelectorAll('li').length === 0) {
       // We should delete the whole block
-    }
+    //}
 
     self.port.emit('remove_link', {
       time: t.dataset.time,
