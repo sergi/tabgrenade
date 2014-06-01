@@ -29,7 +29,7 @@ h1 {
   text-decoration: none;
 }
 
-.open_page, .restore_all, .delete_all {
+.open_page, .restore_all, .remove_group {
   cursor: pointer;
   padding-right: 30px;
   display: inline-block;

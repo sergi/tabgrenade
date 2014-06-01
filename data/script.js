@@ -9,7 +9,6 @@ var TabGroup = Parse.Object.extend("TabGroup");
 document.addEventListener('click', function(e) {
   var obj;
   var t = e.target;
-  var id = parseInt(t.parentNode.getAttribute('data-id'), 10);
 
   if (!tabsByTime) {
     return;
@@ -17,7 +16,7 @@ document.addEventListener('click', function(e) {
 
   if (t.classList.contains('open_page')) {
     var group = new TabGroup();
-    obj = tabsByTime[id];
+    obj = tabsByTime[parseInt(t.dataset.id)];
     group.set('tabs', obj);
     group.save(null, {
       success: function(data) {
@@ -32,7 +31,8 @@ document.addEventListener('click', function(e) {
   }
 
   if (t.classList.contains('restore_all')) {
-    tabsByTime[id].forEach(self.port.emit.bind(this, 'open_tab'));
+    tabsByTime[parseInt(t.dataset.id)]
+      .forEach(self.port.emit.bind(this, 'open_tab'));
   }
 
   if (t.classList.contains('closeBtn')) {
@@ -42,14 +42,19 @@ document.addEventListener('click', function(e) {
     //if (li.parentNode.querySelectorAll('li').length === 0) {
       // We should delete the whole block
     //}
-console.log(li);
+
     self.port.emit('remove_link', {
       time: t.dataset.time,
       index: t.dataset.index
     });
   }
 
-  if (t.classList.contains('remove_all')) {
+  if (t.classList.contains('remove_group')) {
+    var group = document.getElementById('group-' + t.dataset.id);
+    if (window.confirm('Are you sure you want to remove the tab group?')) {
+      group.parentNode.removeChild(group);
+      self.port.emit('remove_group', t.dataset.id);
+    }
   }
 });
 
@@ -63,7 +68,8 @@ self.port.on('allTabs', _tabsByTime => {
   var containerFragment = document.createDocumentFragment();
 
   sortedKeys.forEach(function(key) {
-    var blockFragment = document.createDocumentFragment();
+    var group =  document.createElement('div');
+    group.id = 'group-' + key;
     var len = tabsByTime[key].length;
 
     // If there are no links in this group, don't show it.
@@ -80,19 +86,25 @@ self.port.on('allTabs', _tabsByTime => {
     var createdOn = document.createElement('div');
     var restoreAll = document.createElement('div');
     var shareAll = document.createElement('div');
+    var removeAll = document.createElement('div');
 
     h1.textContent = len + ( len > 1 ? ' tabs' : ' tab');
     info.className = 'info_block';
-    info.setAttribute('data-id', key);
     createdOn.className = 'created_on';
     createdOn.textContent = 'Created on ' + formattedTime;
     restoreAll.className = 'restore_all';
+    restoreAll.dataset.id = key;
     restoreAll.textContent = 'Open all';
     shareAll.className = 'open_page';
+    shareAll.dataset.id = key;
     shareAll.textContent = 'Share as web page';
+    removeAll.className = 'remove_group';
+    removeAll.dataset.id = key;
+    removeAll.textContent = 'Remove all in this group';
     info.appendChild(createdOn);
     info.appendChild(restoreAll);
     info.appendChild(shareAll);
+    info.appendChild(removeAll);
 
     tabsByTime[key].forEach(function(item) {
       var _a = document.createElement('a');
@@ -118,11 +130,11 @@ self.port.on('allTabs', _tabsByTime => {
       ul.appendChild(li);
     });
 
-    blockFragment.appendChild(h1);
-    blockFragment.appendChild(info);
-    blockFragment.appendChild(ul);
+    group.appendChild(h1);
+    group.appendChild(info);
+    group.appendChild(ul);
 
-    containerFragment.appendChild(blockFragment);
+    containerFragment.appendChild(group);
   });
 
   container.appendChild(containerFragment);
