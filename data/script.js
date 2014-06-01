@@ -1,6 +1,5 @@
 'use strict';
 
-var timeFormat = 'MMMM Do YYYY, h:mm:ss a';
 Parse.initialize("dibRma54UIQ0UYErXdDV0EPdk32AtUSEBQll0Lc7",
   "iwP0ckwxi7g8ZVWVaJwoel61ckdoUbPPuj2OPPXR");
 
@@ -10,7 +9,7 @@ var TabGroup = Parse.Object.extend("TabGroup");
 document.addEventListener('click', function(e) {
   var obj;
   var t = e.target;
-  var id = parseInt(t.parentNode.getAttribute('data-id'));
+  var id = parseInt(t.parentNode.getAttribute('data-id'), 10);
 
   if (!tabsByTime) {
     return;
@@ -27,7 +26,7 @@ document.addEventListener('click', function(e) {
         });
       },
       error: function(model, error) {
-        console.log(model, error.toSource())
+        console.log(model, error.toSource());
       }
     });
   }
@@ -37,27 +36,25 @@ document.addEventListener('click', function(e) {
   }
 
   if (t.classList.contains('closeBtn')) {
-    var index = parseInt(t.dataset.index);
     var li = t.parentNode;
     li.parentNode.removeChild(li);
 
     //if (li.parentNode.querySelectorAll('li').length === 0) {
       // We should delete the whole block
     //}
-
+console.log(li);
     self.port.emit('remove_link', {
       time: t.dataset.time,
       index: t.dataset.index
     });
   }
+
+  if (t.classList.contains('remove_all')) {
+  }
 });
 
-self.port.on('allTabs', tabs => {
-  tabsByTime = tabs.reduce((prev, curr) => {
-    prev[curr[0]] = curr[1];
-    return prev;
-  }, {});
-
+self.port.on('allTabs', _tabsByTime => {
+  tabsByTime = _tabsByTime;
   var sortedKeys = Object.keys(tabsByTime).sort((a, b) => {
     return a - b;
   }).reverse();
@@ -130,4 +127,3 @@ self.port.on('allTabs', tabs => {
 
   container.appendChild(containerFragment);
 });
-
