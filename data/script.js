@@ -1,11 +1,11 @@
 'use strict';
 
-Parse.initialize("dibRma54UIQ0UYErXdDV0EPdk32AtUSEBQll0Lc7",
-  "iwP0ckwxi7g8ZVWVaJwoel61ckdoUbPPuj2OPPXR");
-
 var tabsByTime;
-var TabGroup = Parse.Object.extend("TabGroup");
 
+if (window.Parse) {
+  Parse.initialize("dibRma54UIQ0UYErXdDV0EPdk32AtUSEBQll0Lc7",
+                   "iwP0ckwxi7g8ZVWVaJwoel61ckdoUbPPuj2OPPXR");
+}
 document.addEventListener('click', function(e) {
   var obj;
   var t = e.target;
@@ -15,6 +15,12 @@ document.addEventListener('click', function(e) {
   }
 
   if (t.classList.contains('open_page')) {
+    if (!window.Parse) {
+      alert('There was a problem generating the page online. Are you connected to the internet?');
+      return;
+    }
+
+    var TabGroup = Parse.Object.extend("TabGroup");
     var group = new TabGroup();
     obj = tabsByTime[parseInt(t.dataset.id)];
     group.set('tabs', obj);
@@ -25,7 +31,7 @@ document.addEventListener('click', function(e) {
         });
       },
       error: function(model, error) {
-        console.log(model, error.toSource());
+        console.error(model, error.toSource());
       }
     });
   }
