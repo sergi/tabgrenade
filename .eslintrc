@@ -1,0 +1,16 @@
+{
+  "env": {
+    "browser": 1,
+      "es6": true
+  },
+    "globals": {
+      "exports": 1,
+      "Parse": 1
+    },
+    "rules": {
+      "quotes": [2, "single"],
+      "no-console": 0,
+      "global-strict": 0,
+      "new-cap": 0
+    }
+}

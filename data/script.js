@@ -1,10 +1,12 @@
+/* global self */
 'use strict';
 
 var tabsByTime;
+var REMOTE_URL = 'http://tabgrena.de/';
 
 if (window.Parse) {
-  Parse.initialize("dibRma54UIQ0UYErXdDV0EPdk32AtUSEBQll0Lc7",
-                   "iwP0ckwxi7g8ZVWVaJwoel61ckdoUbPPuj2OPPXR");
+  Parse.initialize('dibRma54UIQ0UYErXdDV0EPdk32AtUSEBQll0Lc7',
+                   'iwP0ckwxi7g8ZVWVaJwoel61ckdoUbPPuj2OPPXR');
 }
 document.addEventListener('click', function(e) {
   var obj;
@@ -16,18 +18,18 @@ document.addEventListener('click', function(e) {
 
   if (t.classList.contains('open_page')) {
     if (!window.Parse) {
-      alert('There was a problem generating the page online. Are you connected to the internet?');
+      alert('There was a problem generating the page online.');
       return;
     }
 
-    var TabGroup = Parse.Object.extend("TabGroup");
+    var TabGroup = Parse.Object.extend('TabGroup');
     var group = new TabGroup();
     obj = tabsByTime[parseInt(t.dataset.id)];
     group.set('tabs', obj);
     group.save(null, {
       success: function(data) {
         self.port.emit('open_tab', {
-          url: 'http://tabgrena.de/' + data.id
+          url: REMOTE_URL + data.id
         });
       },
       error: function(model, error) {
@@ -36,9 +38,9 @@ document.addEventListener('click', function(e) {
     });
   }
 
+  var emitOpenTab = self.port.emit.bind(this, 'open_tab');
   if (t.classList.contains('restore_all')) {
-    tabsByTime[parseInt(t.dataset.id)]
-      .forEach(self.port.emit.bind(this, 'open_tab'));
+    tabsByTime[parseInt(t.dataset.id, 10)].forEach(emitOpenTab);
   }
 
   if (t.classList.contains('closeBtn')) {
@@ -56,9 +58,9 @@ document.addEventListener('click', function(e) {
   }
 
   if (t.classList.contains('remove_group')) {
-    var group = document.getElementById('group-' + t.dataset.id);
+    var groupEl = document.getElementById('group-' + t.dataset.id);
     if (window.confirm('Are you sure you want to remove the tab group?')) {
-      group.parentNode.removeChild(group);
+      groupEl.parentNode.removeChild(groupEl);
       self.port.emit('remove_group', t.dataset.id);
     }
   }
@@ -74,7 +76,7 @@ self.port.on('allTabs', _tabsByTime => {
   var containerFragment = document.createDocumentFragment();
 
   sortedKeys.forEach(function(key) {
-    var group =  document.createElement('div');
+    var group = document.createElement('div');
     group.id = 'group-' + key;
     var len = tabsByTime[key].length;
 
